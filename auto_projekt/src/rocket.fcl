@@ -1,0 +1,67 @@
+FUNCTION_BLOCK
+
+VAR_INPUT
+distance : REAL;
+position : REAL;
+END_VAR
+
+VAR_OUTPUT
+change_direction : REAL;
+END_VAR
+
+FUZZIFY distance
+TERM veryClose := (0, 1) (25, 1) (50, 0);
+TERM close := (25, 0) (60, 1) (75, 1) (125, 0);
+TERM far := (75, 0) (125, 1) (140, 1) (175, 0);
+TERM farAway := (150, 0) (175, 1) (200, 1);
+END_FUZZIFY
+
+FUZZIFY position
+TERM farLeft := (-100, 1) (-75, 1) (-50, 0);
+TERM left := (-75, 0) (-50, 1) (-10, 1) (-5, 0);
+TERM collision := (-10, 0) (-5, 1) (5, 1) (10, 0);
+TERM right := (5, 0) (10, 1) (50, 1) (75, 0);
+TERM farRight := (50, 0) (75, 1) (100, 1);
+END_FUZZIFY
+
+
+DEFUZZIFY change_direction
+TERM turnLeft := (-10, 1) (-5, 1) (0, 0);
+TERM noChange := (-5, 0) (0, 1) (5, 0);
+TERM turnRight := (0, 0) (5, 1) (10, 1);
+METHOD : COG;
+DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK first
+AND: MIN;
+ACT: MIN;
+
+RULE 0: IF distance IS veryClose    AND position IS farLeft THEN change_direction IS noChange;
+RULE 1: IF distance IS close          AND position IS farLeft THEN change_direction IS noChange;
+RULE 2: IF distance IS far          AND position IS farLeft THEN change_direction IS noChange;
+RULE 3: IF distance IS farAway    AND position IS farLeft THEN change_direction IS noChange;
+
+RULE 4: IF distance IS veryClose    AND position IS left THEN change_direction IS turnRight;
+RULE 5: IF distance IS close          AND position IS left THEN change_direction IS turnRight;
+RULE 6: IF distance IS far          AND position IS left THEN change_direction IS noChange;
+RULE 7: IF distance IS farAway    AND position IS left THEN change_direction IS noChange;
+
+RULE 8: IF distance IS veryClose    AND position IS collision THEN change_direction IS turnRight;
+RULE 9: IF distance IS close          AND position IS collision THEN change_direction IS turnRight;
+RULE 10: IF distance IS far          AND position IS collision THEN change_direction IS turnRight;
+RULE 11: IF distance IS farAway    AND position IS collision THEN change_direction IS noChange;
+
+RULE 12: IF distance IS veryClose    AND position IS right THEN change_direction IS turnLeft;
+RULE 13: IF distance IS close          AND position IS right THEN change_direction IS turnLeft;
+RULE 14: IF distance IS far          AND position IS right THEN change_direction IS noChange;
+RULE 15: IF distance IS farAway    AND position IS right THEN change_direction IS noChange;
+
+RULE 16: IF distance IS veryClose    AND position IS farRight THEN change_direction IS noChange;
+RULE 17: IF distance IS close          AND position IS farRight THEN change_direction IS noChange;
+RULE 18: IF distance IS far          AND position IS farRight THEN change_direction IS noChange;
+RULE 19: IF distance IS farAway    AND position IS farRight THEN change_direction IS noChange;
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
